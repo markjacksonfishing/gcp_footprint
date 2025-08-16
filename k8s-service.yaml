@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gcp-footprint
+  labels:
+    app: gcp-footprint
+spec:
+  selector:
+    app: gcp-footprint
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP

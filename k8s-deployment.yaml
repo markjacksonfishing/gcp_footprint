@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcp-footprint
+  labels:
+    app: gcp-footprint
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gcp-footprint
+  template:
+    metadata:
+      labels:
+        app: gcp-footprint
+    spec:
+      containers:
+      - name: gcp-footprint
+        image: gcp_footprint:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /creds/key.json
+        volumeMounts:
+        - name: gcp-creds
+          mountPath: /creds
+          readOnly: true
+        - name: output
+          mountPath: /output
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: gcp-creds
+        secret:
+          secretName: gcp-creds
+          items:
+          - key: key.json
+            path: key.json
+      - name: output
+        emptyDir: {}
+      restartPolicy: Always
